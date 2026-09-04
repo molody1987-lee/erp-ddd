@@ -62,31 +62,34 @@ com.company.erp.{context}/ # 如 purchase, inventory, sales
 │ ├── event/ # 领域事件
 │ │ └── PurchaseOrderReceivedEvent.java
 │ ├── service/ # 领域服务 (跨聚合业务)
-│ │ └── PurchaseOrderValidator.java
+│ │ └── PurchaseOrderService.java
 │ └── repository/ # 仓储接口 (定义在 Domain)
 │ └── PurchaseOrderRepository.java
 ├── application/ # 应用层 (用例编排)
 │ ├── service/ # 应用服务 (事务边界)
-│ │ ├── PurchaseOrderApplicationService.java
-│ │ └── PurchaseOrderQueryService.java
+│ │ ├── PurchaseOrderAppService.java
+│ │ └── PurchaseOrderQueryAppService.java
 │ ├── command/ # 命令对象 (CQRS)
 │ │ ├── CreatePurchaseOrderCommand.java
 │ │ └── ReceivePurchaseOrderCommand.java
 │ ├── dto/ # 数据传输对象
 │ │ └── PurchaseOrderDTO.java
-│ └── listener/ # 事件监听器
-│ └── InventoryReceivedEventListener.java
+│ └── subscriber/ # 事件订阅者
+│ └── InventoryReceivedEventSubscriber.java
 ├── infrastructure/ # 基础设施层 (技术实现)
 │ ├── repository/ # 仓储实现 (MyBatis-Plus Mapper)
 │ │ ├── PurchaseOrderMapper.java # MyBatis-Plus Mapper 接口
 │ │ └── PurchaseOrderRepositoryImpl.java # 实现 Domain 接口
+│ ├── client/ # 客户端接口实现 (客户端接口)
+│ │ ├── InventoryClient.java # 客户端接口
+│ │ └── InventoryClientImpl.java # 实现客户端接口
 │ ├── persistence/ # PO 对象 (MySQL 表映射)
 │ │ └── PurchaseOrderPO.java
 │ ├── cache/ # Redis 缓存实现
 │ │ └── RedisCacheService.java
 │ ├── message/ # RocketMQ 实现
 │ │ ├── RocketMQEventPublisher.java
-│ │ └── RocketMQEventConsumer.java
+│ │ └── RocketMQEventSubscriber.java
 │ ├── config/ # 配置类
 │ │ ├── MyBatisPlusConfig.java
 │ │ └── RocketMQConfig.java
@@ -94,6 +97,8 @@ com.company.erp.{context}/ # 如 purchase, inventory, sales
 │ └── TraceAspect.java # 自定义追踪切面
 └── interfaces/ # 接口层 (表现层)
 └── rest/ # REST API
+│  ├── PurchaseOrderResource.java
+│  ├── PurchaseOrderResourceImpl.java
 └── PurchaseOrderController.java
 
 
