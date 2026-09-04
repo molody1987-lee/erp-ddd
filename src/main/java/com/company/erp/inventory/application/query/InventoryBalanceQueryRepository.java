@@ -2,6 +2,7 @@ package com.company.erp.inventory.application.query;
 
 import com.company.erp.inventory.application.dto.InventoryBalanceDTO;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -10,4 +11,6 @@ import java.util.Optional;
 public interface InventoryBalanceQueryRepository {
 
     Optional<InventoryBalanceDTO> findBalance(Long materialId, Long orgId);
+
+    List<InventoryBalanceDTO> findByOrgId(Long orgId);
 }

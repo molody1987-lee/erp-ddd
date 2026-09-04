@@ -5,6 +5,7 @@ import com.company.erp.inventory.application.query.InventoryBalanceQueryReposito
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -18,5 +19,9 @@ public class InventoryBalanceQueryAppService {
 
     public Optional<InventoryBalanceDTO> getBalance(Long materialId, Long orgId) {
         return queryRepository.findBalance(materialId, orgId);
+    }
+
+    public List<InventoryBalanceDTO> listByOrg(Long orgId) {
+        return queryRepository.findByOrgId(orgId);
     }
 }

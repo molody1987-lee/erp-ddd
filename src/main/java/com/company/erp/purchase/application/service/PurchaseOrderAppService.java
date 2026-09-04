@@ -1,6 +1,8 @@
 package com.company.erp.purchase.application.service;
 
 import com.company.erp.purchase.application.command.CreatePurchaseOrderCommand;
+import com.company.erp.purchase.application.command.CreatePurchaseOrderItemCommand;
+import com.company.erp.purchase.application.command.ModifyPurchaseOrderCommand;
 import com.company.erp.purchase.application.command.ReceivePurchaseOrderCommand;
 import com.company.erp.purchase.application.command.ReviewPurchaseOrderCommand;
 import com.company.erp.purchase.domain.aggregate.PurchaseOrder;
@@ -38,15 +40,47 @@ public class PurchaseOrderAppService {
 
     @Transactional
     public PurchaseOrderId createOrder(CreatePurchaseOrderCommand command) {
-        List<PurchaseOrderItem> items = command.items().stream()
+        return createOrderInternal(command);
+    }
+
+    @Transactional
+    public void modifyOrder(ModifyPurchaseOrderCommand command) {
+        PurchaseOrder order = repository.findById(command.orderId())
+                .orElseThrow(() -> new PurchaseDomainException("采购订单不存在: " + command.orderId().value()));
+        order.modify(command.orderCode(), command.supplierId(), toItems(command.items()));
+        repository.deleteItems(command.orderId());
+        repository.save(order);
+    }
+
+    @Transactional
+    public void cancelOrder(PurchaseOrderId orderId) {
+        PurchaseOrder order = repository.findById(orderId)
+                .orElseThrow(() -> new PurchaseDomainException("采购订单不存在: " + orderId.value()));
+        order.close();
+        repository.save(order);
+    }
+
+    @Transactional
+    public int importOrders(List<CreatePurchaseOrderCommand> commands) {
+        for (CreatePurchaseOrderCommand command : commands) {
+            createOrderInternal(command);
+        }
+        return commands.size();
+    }
+
+    private PurchaseOrderId createOrderInternal(CreatePurchaseOrderCommand command) {
+        PurchaseOrder order = PurchaseOrder.create(command.orderCode(), command.supplierId(),
+                command.orgId(), toItems(command.items()));
+        return repository.save(order);
+    }
+
+    private List<PurchaseOrderItem> toItems(List<CreatePurchaseOrderItemCommand> itemCommands) {
+        return itemCommands.stream()
                 .map(item -> PurchaseOrderItem.create(
                         new MaterialId(item.materialId()),
                         new Quantity(item.quantity(), item.unit()),
                         new Money(item.unitPrice(), item.currency())))
                 .toList();
-        PurchaseOrder order = PurchaseOrder.create(command.orderCode(), command.supplierId(),
-                command.orgId(), items);
-        return repository.save(order);
     }
 
     @Transactional

@@ -106,6 +106,7 @@ com.company.erp.{context}/ # 如 purchase, inventory, sales
 
 ### 5.1 分层依赖规则
 - ✅ **允许**：Interface → Application → Domain ← Infrastructure
+- Interface接口必须包含，创建，修改，提交，取消，列表查询，详情查询，导入，导出功能
 - ❌ **禁止**：Domain 层 import 任何 MyBatis-Plus、RocketMQ 的类。
 - ❌ **禁止**：Application 层直接调用 `XXXMapper`（必须通过 Domain 层的 Repository 接口）。
 - ❌ **禁止**：Controller 直接调用 Repository。

@@ -13,4 +13,6 @@ public interface PurchaseOrderRepository {
     PurchaseOrderId save(PurchaseOrder order);
 
     Optional<PurchaseOrder> findById(PurchaseOrderId id);
+
+    void deleteItems(PurchaseOrderId orderId);
 }

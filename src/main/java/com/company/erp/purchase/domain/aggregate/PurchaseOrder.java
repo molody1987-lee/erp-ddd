@@ -113,6 +113,29 @@ public class PurchaseOrder {
     }
 
     /**
+     * 修改：只有草稿状态可修改，可变更订单编号、供应商与明细。
+     */
+    public void modify(String orderCode, Long supplierId, List<PurchaseOrderItem> newItems) {
+        if (this.status != PurchaseOrderStatus.DRAFT) {
+            throw new PurchaseDomainException("只有草稿状态的订单才能修改");
+        }
+        if (orderCode == null || orderCode.isBlank()) {
+            throw new PurchaseDomainException("订单编号不能为空");
+        }
+        if (supplierId == null || supplierId <= 0) {
+            throw new PurchaseDomainException("供应商ID不能为空");
+        }
+        if (newItems == null || newItems.isEmpty()) {
+            throw new PurchaseDomainException("采购订单必须包含明细");
+        }
+        this.orderCode = orderCode;
+        this.supplierId = supplierId;
+        this.items.clear();
+        this.items.addAll(newItems);
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    /**
      * 关闭：已入库订单不可关闭。
      */
     public void close() {

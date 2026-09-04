@@ -58,4 +58,10 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepository {
                         .eq(PurchaseOrderItemPO::getOrderId, id.value()));
         return Optional.of(converter.toDomain(po, items));
     }
+
+    @Override
+    public void deleteItems(PurchaseOrderId orderId) {
+        itemMapper.delete(new LambdaQueryWrapper<PurchaseOrderItemPO>()
+                .eq(PurchaseOrderItemPO::getOrderId, orderId.value()));
+    }
 }

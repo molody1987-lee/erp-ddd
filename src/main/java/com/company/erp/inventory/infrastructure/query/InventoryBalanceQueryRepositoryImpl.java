@@ -8,6 +8,7 @@ import com.company.erp.inventory.infrastructure.repository.InventoryBalanceMappe
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -24,15 +25,25 @@ public class InventoryBalanceQueryRepositoryImpl implements InventoryBalanceQuer
         InventoryBalancePO po = mapper.selectOne(new LambdaQueryWrapper<InventoryBalancePO>()
                 .eq(InventoryBalancePO::getMaterialId, materialId)
                 .eq(InventoryBalancePO::getOrgId, orgId));
-        if (po == null) {
-            return Optional.empty();
-        }
-        return Optional.of(new InventoryBalanceDTO(
+        return po == null ? Optional.empty() : Optional.of(toDTO(po));
+    }
+
+    @Override
+    public List<InventoryBalanceDTO> findByOrgId(Long orgId) {
+        return mapper.selectList(new LambdaQueryWrapper<InventoryBalancePO>()
+                        .eq(InventoryBalancePO::getOrgId, orgId))
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    private InventoryBalanceDTO toDTO(InventoryBalancePO po) {
+        return new InventoryBalanceDTO(
                 po.getId(),
                 po.getMaterialId(),
                 po.getOrgId(),
                 po.getQuantityOnHand(),
                 po.getUnit(),
-                po.getUnitCost()));
+                po.getUnitCost());
     }
 }

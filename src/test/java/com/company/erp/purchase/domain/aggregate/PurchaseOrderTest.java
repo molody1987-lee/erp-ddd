@@ -179,6 +179,57 @@ class PurchaseOrderTest {
     }
 
     @Test
+    void shouldModifyDraftOrder() {
+        PurchaseOrder order = newDraftOrder();
+        PurchaseOrderItem newItem = PurchaseOrderItem.create(new MaterialId(200L),
+                new Quantity(new BigDecimal("20"), "PCS"),
+                new Money(new BigDecimal("8.00"), "CNY"));
+
+        order.modify("PO-009", 20L, List.of(newItem));
+
+        assertThat(order.getOrderCode()).isEqualTo("PO-009");
+        assertThat(order.getSupplierId()).isEqualTo(20L);
+        assertThat(order.getItems()).hasSize(1);
+        assertThat(order.getItems().get(0).getMaterialId()).isEqualTo(new MaterialId(200L));
+    }
+
+    @Test
+    void shouldRejectModifyingNonDraftOrder() {
+        PurchaseOrder order = newDraftOrder();
+        order.review(9L);
+
+        assertThatThrownBy(() -> order.modify("PO-009", 20L, List.of(newItem())))
+                .isInstanceOf(PurchaseDomainException.class)
+                .hasMessageContaining("草稿");
+    }
+
+    @Test
+    void shouldRejectModifyWithBlankOrderCode() {
+        PurchaseOrder order = newDraftOrder();
+
+        assertThatThrownBy(() -> order.modify(" ", 20L, List.of(newItem())))
+                .isInstanceOf(PurchaseDomainException.class)
+                .hasMessageContaining("订单编号");
+    }
+
+    @Test
+    void shouldRejectModifyWithInvalidSupplierId() {
+        PurchaseOrder order = newDraftOrder();
+
+        assertThatThrownBy(() -> order.modify("PO-009", null, List.of(newItem())))
+                .isInstanceOf(PurchaseDomainException.class);
+    }
+
+    @Test
+    void shouldRejectModifyWithEmptyItems() {
+        PurchaseOrder order = newDraftOrder();
+
+        assertThatThrownBy(() -> order.modify("PO-009", 20L, List.of()))
+                .isInstanceOf(PurchaseDomainException.class)
+                .hasMessageContaining("明细");
+    }
+
+    @Test
     void shouldReconstituteReviewedOrder() {
         PurchaseOrder order = newDraftOrder();
         order.review(9L);
